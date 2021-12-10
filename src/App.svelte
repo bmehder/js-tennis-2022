@@ -80,20 +80,63 @@
   }
 </script>
 
-<footer>
-  {#if isInProgress}
-    <div>
-      <button on:click={() => handlePoint('player1')}>Player 1</button>
-      <button on:click={() => handlePoint('player2')}>Player 2</button>
-    </div>
-  {/if}
-</footer>
+<main>
+  <section>
+    <div />
+    <div>Set 1</div>
+    <div>Set 2</div>
+    <div>Set 3</div>
+    <div>Game</div>
+  </section>
+  <section>
+    <span>Player 1</span>
+    <div>{match.score['player1'].set1}</div>
+    <div>{match.score['player1'].set2}</div>
+    <div>{match.score['player1'].set3}</div>
+    <div>{match.score['player1'].game}</div>
+    <span>Player 2</span>
+    <div>{match.score['player2'].set1}</div>
+    <div>{match.score['player2'].set2}</div>
+    <div>{match.score['player2'].set3}</div>
+    <div>{match.score['player2'].game}</div>
+  </section>
+
+  <footer>
+    {#if isInProgress}
+      <div>
+        <button on:click={() => handlePoint('player1')}>Player 1</button>
+        <button on:click={() => handlePoint('player2')}>Player 2</button>
+      </div>
+    {/if}
+  </footer>
+</main>
 
 <style>
+  main {
+    width: 500px;
+    margin: auto;
+    text-align: center;
+  }
+  section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  }
+  section:first-child {
+    background: #f1f1f1;
+    font-weight: bold;
+  }
+  div,
+  span {
+    padding: 1rem;
+  }
+  span {
+    text-align: left;
+  }
   footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    /* min-height: 100vh; */
+    margin-top: 1rem;
   }
 </style>
