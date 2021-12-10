@@ -2,6 +2,8 @@
   import { match } from './state'
   import { normalGamePointIncrease } from './utils'
 
+  let isInProgress = true
+
   // 	Predicates
   const isDeuce = () =>
     match.score['player1'].game === '40' && match.score['player2'].game === '40'
@@ -19,6 +21,7 @@
           2)
     )
   }
+  const isMatchOver = winner => match.score[winner].setsWon === 2
 
   // State Mutations
   const resetGameScore = () => {
@@ -30,7 +33,14 @@
     resetGameScore()
     const currentSet = 'set' + match.currentSet
     match.score[winner][currentSet]++
-    if (isSetOver()) match.currentSet++
+    if (isSetOver()) {
+      match.currentSet++
+      match.score[winner].setsWon++
+    }
+    if (isMatchOver(winner)) {
+      alert(`${winner} won the match!`)
+      isInProgress = false
+    }
   }
 
   // 	Event handler
@@ -71,10 +81,12 @@
 </script>
 
 <footer>
-  <div>
-    <button on:click={() => handlePoint('player1')}>Player 1</button>
-    <button on:click={() => handlePoint('player2')}>Player 2</button>
-  </div>
+  {#if isInProgress}
+    <div>
+      <button on:click={() => handlePoint('player1')}>Player 1</button>
+      <button on:click={() => handlePoint('player2')}>Player 2</button>
+    </div>
+  {/if}
 </footer>
 
 <style>
