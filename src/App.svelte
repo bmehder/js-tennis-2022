@@ -7,7 +7,9 @@
   // 	Predicates
   const isDeuce = () =>
     match.score['player1'].game === '40' && match.score['player2'].game === '40'
+
   const isGameOver = winner => match.score[winner].game === '0'
+
   const isSetOver = () => {
     const currentSet = 'set' + match.currentSet
     return (
@@ -94,7 +96,6 @@
   // 	Console Logging
   $: {
     console.clear()
-    // console.log('Current set:', match.currentSet)
     console.log('Current set:', match.currentSet)
     console.log('isDeuce:', isDeuce())
     console.table(match.score)
