@@ -295,10 +295,13 @@
   }
   button {
     width: 100%;
+    margin: 0 0 0.5em 0;
     padding: 1.5rem 2rem;
     background: darkorange;
     color: black;
     border: none;
+    font-size: inherit;
+    font-family: inherit;
     font-weight: bold;
     border-radius: 8px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
