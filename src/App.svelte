@@ -23,7 +23,7 @@
   }
   const isMatchOver = winner => match.score[winner].setsWon === 2
 
-  // State Mutations
+  // State Mutation Functions
   const resetGameScore = () => {
     match.score['player1'].game = '0'
     match.score['player2'].game = '0'
@@ -43,7 +43,28 @@
     }
   }
 
-  // 	Event handler
+  // 	Event handlers
+  const handleReset = () => {
+    match.currentSet = 1
+    match.score = {
+      player1: {
+        set1: 0,
+        set2: 0,
+        set3: 0,
+        game: '0',
+        setsWon: 0,
+      },
+      player2: {
+        set1: 0,
+        set2: 0,
+        set3: 0,
+        game: '0',
+        setsWon: 0,
+      },
+    }
+    return true
+  }
+
   const handlePoint = theWinner => {
     const winner = theWinner
     const loser = winner === 'player1' ? 'player2' : 'player1'
@@ -80,7 +101,8 @@
   }
 </script>
 
-<main>
+<aside>
+  <header><h1>JS Tennis 2022</h1></header>
   <section>
     <div />
     <div>Set 1</div>
@@ -107,27 +129,41 @@
         <button on:click={() => handlePoint('player1')}>Player 1</button>
         <button on:click={() => handlePoint('player2')}>Player 2</button>
       </div>
+    {:else}
+      <div>
+        <button on:click={() => handleReset() && (isInProgress = true)}
+          >Reset</button
+        >
+      </div>
     {/if}
   </footer>
-</main>
+</aside>
 
 <style>
-  main {
+  aside {
     width: 500px;
     margin: auto;
     text-align: center;
   }
+  header {
+    padding: 2rem;
+    text-align: center;
+  }
+  h1 {
+    font-size: 2rem;
+  }
   section {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    background: white;
   }
-  section:first-child {
+  section:nth-child(2) {
     background: #f1f1f1;
     font-weight: bold;
   }
   div,
   span {
-    padding: 1rem;
+    padding: 1.5rem 1rem;
   }
   span {
     text-align: left;
@@ -138,5 +174,9 @@
     align-items: center;
     /* min-height: 100vh; */
     margin-top: 1rem;
+  }
+  button {
+    padding: 1rem 2rem;
+    background: #f1f1f1;
   }
 </style>
