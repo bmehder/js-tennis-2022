@@ -1,12 +1,13 @@
 <script>
-  import { scale, fly } from 'svelte/transition'
-  import NewMatch from './state'
+  import { scale } from 'svelte/transition'
+  import Match from './state'
   import { normalGamePointIncrease } from './utils'
   import Todo from './Todo.svelte'
 
-  const match = new NewMatch()
+  const match = new Match()
 
   let isInProgress = true
+  let playerToServe = 'player1'
 
   $: currentSet = 'set' + match.currentSet
 
@@ -54,6 +55,8 @@
 
     match.score[winner][currentSet]++
 
+    playerToServe = playerToServe === 'player1' ? 'player2' : 'player1'
+
     if (isSetOver()) {
       match.currentSet++
       match.score[winner].setsWon++
@@ -66,6 +69,7 @@
   }
 
   const scoreTiebreak = winner => {
+    playerToServe = null
     winner === 'player1'
       ? match.score.player1.tiebreak++
       : [match.score.player2.tiebreak++]
@@ -79,6 +83,8 @@
       match.score[winner][currentSet]++
       match.currentSet++
       match.score[winner].setsWon++
+      match.score.setWinner[currentSet] = winner
+      playerToServe = winner === 'player1' ? 'player2' : 'player1'
       resetGameScore()
     }
 
@@ -106,6 +112,11 @@
         game: '0',
         setsWon: 0,
         tiebreak: 0,
+      },
+      setWinner: {
+        set1: null,
+        set2: null,
+        set3: null,
       },
     }
     return true
@@ -167,7 +178,10 @@
   </section>
 
   <section>
-    <span>Player 1</span>
+    <span
+      >Player 1{#if playerToServe === 'player1'}
+        &nbsp; &bull;{/if}</span
+    >
     {#key match.score['player1'].set1}
       <div class:bold={match.score.setWinner?.set1 === 'player1'} in:scale>
         {match.score['player1'].set1}
@@ -185,12 +199,19 @@
     {/key}
     {#key match.score.player1.game && match.score.player1.tiebreak}
       {#if isTiebreak()}
-        <div class="point" in:scale>{match.score['player1'].tiebreak}</div>
+        <div class="point" in:scale>
+          {match.score['player1'].tiebreak}
+        </div>
       {:else}
-        <div class="point" in:scale>{match.score['player1'].game}</div>
+        <div class="point" in:scale>
+          {match.score['player1'].game}
+        </div>
       {/if}
     {/key}
-    <span>Player 2</span>
+    <span
+      >Player 2 {#if playerToServe === 'player2'}
+        &nbsp; &bull;{/if}</span
+    >
     {#key match.score['player2'].set1}
       <div class:bold={match.score.setWinner?.set1 === 'player2'} in:scale>
         {match.score['player2'].set1}
@@ -208,9 +229,13 @@
     {/key}
     {#key match.score.player2.game && match.score.player2.tiebreak}
       {#if isTiebreak()}
-        <div class="point" in:scale>{match.score['player2'].tiebreak}</div>
+        <div class="point" in:scale>
+          {match.score['player2'].tiebreak}
+        </div>
       {:else}
-        <div class="point" in:scale>{match.score['player2'].game}</div>
+        <div class="point" in:scale>
+          {match.score['player2'].game}
+        </div>
       {/if}
     {/key}
   </section>
@@ -230,7 +255,7 @@
 
 <style>
   aside {
-    width: 600px;
+    width: 700px;
     margin: auto;
     text-align: center;
   }

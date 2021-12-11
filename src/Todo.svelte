@@ -3,7 +3,6 @@
   <div>
     <ul>
       <li>Nicer UI</li>
-      <li>Bold winning set score</li>
       <li>Add tiebreak score to set</li>
     </ul>
     <ul>

@@ -1,4 +1,4 @@
-export default class MakeMatch {
+export default class Match {
   constructor() {
     return {
       currentSet: 1,
@@ -20,9 +20,9 @@ export default class MakeMatch {
           tiebreak: 0,
         },
         setWinner: {
-          set1: '',
-          set2: '',
-          set3: '',
+          set1: null,
+          set2: null,
+          set3: null,
         },
       },
     }
