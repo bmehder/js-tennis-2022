@@ -31,17 +31,12 @@ h1 {
 }
 
 a {
-  /* color: rgb(0, 100, 200); */
   color: white;
   text-decoration: none;
 }
 
 a:hover {
   text-decoration: underline;
-}
-
-label {
-  display: block;
 }
 
 input,
@@ -60,24 +55,6 @@ textarea {
 
 input:disabled {
   color: #ccc;
-}
-
-button {
-  color: #333;
-  background-color: #f4f4f4;
-  outline: none;
-}
-
-button:disabled {
-  color: #999;
-}
-
-button:not(:disabled):active {
-  background-color: #ddd;
-}
-
-button:focus {
-  border-color: #666;
 }
 
 @media screen and (max-height: 420px) {

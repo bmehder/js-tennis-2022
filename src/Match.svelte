@@ -266,7 +266,7 @@
   }
   section:nth-child(1) {
     padding: 0 1.5rem;
-    background: #f1f1f1;
+    background: #e1e1e1;
     font-weight: bold;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -302,9 +302,14 @@
     font-weight: bold;
     border-radius: 8px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
+    user-select: none;
+  }
+  button:hover {
+    transform: scale(0.99);
+    transition: all 100ms ease-in-out;
   }
   .highlight {
-    background: #ddd;
+    background: #ccc;
   }
   .point {
     font-weight: bold;
