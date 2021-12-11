@@ -203,7 +203,7 @@
           {match.score['player1'].tiebreak}
         </div>
       {:else}
-        <div class="point" in:scale>
+        <div class="point" class:gray={!isInProgress} in:scale>
           {match.score['player1'].game}
         </div>
       {/if}
@@ -233,7 +233,7 @@
           {match.score['player2'].tiebreak}
         </div>
       {:else}
-        <div class="point" in:scale>
+        <div class="point" class:gray={!isInProgress} in:scale>
           {match.score['player2'].game}
         </div>
       {/if}
@@ -319,6 +319,9 @@
   }
   .bold {
     font-weight: bold;
+  }
+  .gray {
+    color: lightgrey;
   }
   @media screen and (max-height: 400px) {
     header {
