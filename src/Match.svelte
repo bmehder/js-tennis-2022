@@ -1,7 +1,7 @@
 <script>
   import { scale } from 'svelte/transition'
   import Match from './state'
-  import { normalGamePointIncrease } from './utils'
+  import { gamePointEnum } from './utils'
 
   const match = new Match()
 
@@ -147,7 +147,7 @@
       return updateSet(winner)
     }
 
-    match.score[winner].game = normalGamePointIncrease[winnerScore]
+    match.score[winner].game = gamePointEnum[winnerScore]
 
     if (isGameOver(winner)) updateSet(winner)
   }
@@ -248,7 +248,6 @@
       >
     {/if}
   </footer>
-  <!-- <Todo /> -->
 </aside>
 
 <style>
