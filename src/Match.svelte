@@ -2,7 +2,6 @@
   import { scale } from 'svelte/transition'
   import Match from './state'
   import { normalGamePointIncrease } from './utils'
-  import Todo from './Todo.svelte'
 
   const match = new Match()
 
@@ -164,7 +163,6 @@
 </script>
 
 <aside>
-  <header><h1>JS Tennis 2022</h1></header>
   <section>
     <div />
     <div class:highlight={match.currentSet === 1}>Set 1</div>
@@ -259,13 +257,6 @@
     margin: auto;
     text-align: center;
   }
-  header {
-    padding: 2rem;
-    text-align: center;
-  }
-  h1 {
-    font-size: 2rem;
-  }
   section {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
@@ -274,14 +265,14 @@
     text-align: center;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
   }
-  section:nth-child(2) {
+  section:nth-child(1) {
     padding: 0 1.5rem;
     background: #f1f1f1;
     font-weight: bold;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
   }
-  section:nth-child(3) {
+  section:nth-child(2) {
     padding: 1.5em;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -305,8 +296,10 @@
   }
   button {
     width: 100%;
-    padding: 1rem 2rem;
-    background: #f1f1f1;
+    padding: 1.5rem 2rem;
+    background: darkorange;
+    color: black;
+    border: none;
     font-weight: bold;
     border-radius: 8px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
@@ -322,10 +315,5 @@
   }
   .gray {
     color: lightgrey;
-  }
-  @media screen and (max-height: 400px) {
-    header {
-      display: none;
-    }
   }
 </style>
