@@ -181,21 +181,21 @@
         &nbsp; &bull;{/if}</span
     >
     {#key match.score['player1'].set1}
-      <div class:bold={match.score.setWinner?.set1 === 'player1'} in:scale>
+      <div class:bold={match.score.setWinner.set1 === 'player1'} in:scale>
         {match.score['player1'].set1}
       </div>
     {/key}
     {#key match.score['player1'].set2}
-      <div class:bold={match.score.setWinner?.set2 === 'player1'} in:scale>
+      <div class:bold={match.score.setWinner.set2 === 'player1'} in:scale>
         {match.score['player1'].set2}
       </div>
     {/key}
     {#key match.score['player1'].set3}
-      <div class:bold={match.score.setWinner?.set3 === 'player1'} in:scale>
+      <div class:bold={match.score.setWinner.set3 === 'player1'} in:scale>
         {match.score['player1'].set3}
       </div>
     {/key}
-    {#key match.score.player1.game && match.score.player1.tiebreak}
+    {#key match.score.player1.game}
       {#if isTiebreak()}
         <div class="point" in:scale>
           {match.score['player1'].tiebreak}
@@ -211,21 +211,21 @@
         &nbsp; &bull;{/if}</span
     >
     {#key match.score['player2'].set1}
-      <div class:bold={match.score.setWinner?.set1 === 'player2'} in:scale>
+      <div class:bold={match.score.setWinner.set1 === 'player2'} in:scale>
         {match.score['player2'].set1}
       </div>
     {/key}
     {#key match.score['player2'].set2}
-      <div class:bold={match.score.setWinner?.set2 === 'player2'} in:scale>
+      <div class:bold={match.score.setWinner.set2 === 'player2'} in:scale>
         {match.score['player2'].set2}
       </div>
     {/key}
     {#key match.score['player2'].set3}
-      <div class:bold={match.score.setWinner?.set3 === 'player2'} in:scale>
+      <div class:bold={match.score.setWinner.set3 === 'player2'} in:scale>
         {match.score['player2'].set3}
       </div>
     {/key}
-    {#key match.score.player2.game && match.score.player2.tiebreak}
+    {#key match.score.player2.game}
       {#if isTiebreak()}
         <div class="point" in:scale>
           {match.score['player2'].tiebreak}

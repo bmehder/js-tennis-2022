@@ -83,7 +83,7 @@ button:focus {
   border-color: #666;
 }
 
-@media screen and (max-height: 400px) {
+@media screen and (max-height: 420px) {
   h1 {
     display: none;
   }
