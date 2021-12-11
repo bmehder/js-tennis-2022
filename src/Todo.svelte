@@ -11,10 +11,6 @@
       <li>doubles scoring</li>
     </ul>
     <ul>
-      <li>multiple instances</li>
-      <li>make match a class</li>
-    </ul>
-    <ul>
       <li>edit score</li>
     </ul>
   </div>
