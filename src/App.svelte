@@ -53,14 +53,16 @@
   }
 
   const scoreTiebreak = winner => {
-    let p1tb = match.score.player1.tiebreak
-    let p2tb = match.score.player2.tiebreak
-
     winner === 'player1'
       ? match.score.player1.tiebreak++
       : [match.score.player2.tiebreak++]
 
-    if ((p1tb >= 6 && p1tb > p2tb) || (p2tb >= 6 && p2tb > p1tb)) {
+    if (
+      (match.score.player1.tiebreak >= 7 &&
+        match.score.player1.tiebreak - match.score.player2.tiebreak >= 2) ||
+      (match.score.player2.tiebreak >= 7 &&
+        match.score.player2.tiebreak - match.score.player1.tiebreak >= 2)
+    ) {
       match.currentSet++
       match.score[winner].setsWon++
       match.score[winner][currentSet]++
