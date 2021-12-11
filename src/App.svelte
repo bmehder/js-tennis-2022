@@ -26,7 +26,7 @@
   }
   const isMatchOver = winner => match.score[winner].setsWon === 2
 
-  const isTiebreak = () =>
+  $: isTiebreak = () =>
     match.score['player1'][currentSet] === 6 &&
     match.score['player2'][currentSet] === 6
 
@@ -34,6 +34,8 @@
   const resetGameScore = () => {
     match.score['player1'].game = '0'
     match.score['player2'].game = '0'
+    match.score.player1.tiebreak = 0
+    match.score.player2.tiebreak = 0
   }
 
   const updateSet = winner => {
@@ -63,12 +65,15 @@
       (match.score.player2.tiebreak >= 7 &&
         match.score.player2.tiebreak - match.score.player1.tiebreak >= 2)
     ) {
+      match.score[winner][currentSet]++
       match.currentSet++
       match.score[winner].setsWon++
-      match.score[winner][currentSet]++
-      match.score.player1.tiebreak = 0
-      match.score.player2.tiebreak = 0
       resetGameScore()
+    }
+
+    if (isMatchOver(winner)) {
+      alert(`${winner} won the match!`)
+      isInProgress = false
     }
   }
 
@@ -145,8 +150,11 @@
     <div>Set 1</div>
     <div>Set 2</div>
     <div>Set 3</div>
-    <div>Game</div>
-    <div>TB</div>
+    {#if isTiebreak()}
+      <div>TB</div>
+    {:else}
+      <div>Game</div>
+    {/if}
   </section>
 
   <section>
@@ -154,14 +162,20 @@
     <div>{match.score['player1'].set1}</div>
     <div>{match.score['player1'].set2}</div>
     <div>{match.score['player1'].set3}</div>
-    <div>{match.score['player1'].game}</div>
-    <div>{match.score['player1'].tiebreak}</div>
+    {#if isTiebreak()}
+      <div>{match.score['player1'].tiebreak}</div>
+    {:else}
+      <div>{match.score['player1'].game}</div>
+    {/if}
     <span>Player 2</span>
     <div>{match.score['player2'].set1}</div>
     <div>{match.score['player2'].set2}</div>
     <div>{match.score['player2'].set3}</div>
-    <div>{match.score['player2'].game}</div>
-    <div>{match.score['player2'].tiebreak}</div>
+    {#if isTiebreak()}
+      <div>{match.score['player2'].tiebreak}</div>
+    {:else}
+      <div>{match.score['player2'].game}</div>
+    {/if}
   </section>
 
   <footer>
@@ -195,7 +209,7 @@
   }
   section {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     background: white;
   }
   section:nth-child(2) {
