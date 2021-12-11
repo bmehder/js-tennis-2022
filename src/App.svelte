@@ -1,6 +1,8 @@
 <script>
+  import { scale, fly } from 'svelte/transition'
   import { match } from './state'
   import { normalGamePointIncrease } from './utils'
+  import Todo from './Todo.svelte'
 
   let isInProgress = true
 
@@ -38,6 +40,13 @@
     match.score.player2.tiebreak = 0
   }
 
+  const completeMatch = winner => {
+    const lastSet = match.currentSet - 1
+    match.currentSet = lastSet
+    alert(`${winner} won the match!`)
+    isInProgress = false
+  }
+
   const updateSet = winner => {
     resetGameScore()
 
@@ -49,8 +58,7 @@
     }
 
     if (isMatchOver(winner)) {
-      alert(`${winner} won the match!`)
-      isInProgress = false
+      completeMatch(winner)
     }
   }
 
@@ -72,8 +80,7 @@
     }
 
     if (isMatchOver(winner)) {
-      alert(`${winner} won the match!`)
-      isInProgress = false
+      completeMatch(winner)
     }
   }
 
@@ -144,12 +151,11 @@
 
 <aside>
   <header><h1>JS Tennis 2022</h1></header>
-
   <section>
     <div />
-    <div>Set 1</div>
-    <div>Set 2</div>
-    <div>Set 3</div>
+    <div class:highlight={match.currentSet === 1}>Set 1</div>
+    <div class:highlight={match.currentSet === 2}>Set 2</div>
+    <div class:highlight={match.currentSet === 3}>Set 3</div>
     {#if isTiebreak()}
       <div>TB</div>
     {:else}
@@ -159,39 +165,52 @@
 
   <section>
     <span>Player 1</span>
-    <div>{match.score['player1'].set1}</div>
-    <div>{match.score['player1'].set2}</div>
-    <div>{match.score['player1'].set3}</div>
-    {#if isTiebreak()}
-      <div>{match.score['player1'].tiebreak}</div>
-    {:else}
-      <div>{match.score['player1'].game}</div>
-    {/if}
+    {#key match.score['player1'].set1}
+      <div in:scale>{match.score['player1'].set1}</div>
+    {/key}
+    {#key match.score['player1'].set2}
+      <div in:scale>{match.score['player1'].set2}</div>
+    {/key}
+    {#key match.score['player1'].set3}
+      <div in:scale>{match.score['player1'].set3}</div>
+    {/key}
+    {#key match.score.player1.game && match.score.player1.tiebreak}
+      {#if isTiebreak()}
+        <div class="point" in:scale>{match.score['player1'].tiebreak}</div>
+      {:else}
+        <div class="point" in:scale>{match.score['player1'].game}</div>
+      {/if}
+    {/key}
     <span>Player 2</span>
-    <div>{match.score['player2'].set1}</div>
-    <div>{match.score['player2'].set2}</div>
-    <div>{match.score['player2'].set3}</div>
-    {#if isTiebreak()}
-      <div>{match.score['player2'].tiebreak}</div>
-    {:else}
-      <div>{match.score['player2'].game}</div>
-    {/if}
+    {#key match.score['player2'].set1}
+      <div in:scale>{match.score['player2'].set1}</div>
+    {/key}
+    {#key match.score['player2'].set2}
+      <div in:scale>{match.score['player2'].set2}</div>
+    {/key}
+    {#key match.score['player2'].set3}
+      <div in:scale>{match.score['player2'].set3}</div>
+    {/key}
+    {#key match.score.player2.game && match.score.player2.tiebreak}
+      {#if isTiebreak()}
+        <div class="point" in:scale>{match.score['player2'].tiebreak}</div>
+      {:else}
+        <div class="point" in:scale>{match.score['player2'].game}</div>
+      {/if}
+    {/key}
   </section>
 
   <footer>
     {#if isInProgress}
-      <div>
-        <button on:click={() => handlePoint('player1')}>Player 1</button>
-        <button on:click={() => handlePoint('player2')}>Player 2</button>
-      </div>
+      <button on:click={() => handlePoint('player1')}>Player 1</button>
+      <button on:click={() => handlePoint('player2')}>Player 2</button>
     {:else}
-      <div>
-        <button on:click={() => handleReset() && (isInProgress = true)}
-          >Reset</button
-        >
-      </div>
+      <button on:click={() => handleReset() && (isInProgress = true)}
+        >Reset</button
+      >
     {/if}
   </footer>
+  <!-- <Todo /> -->
 </aside>
 
 <style>
@@ -210,27 +229,60 @@
   section {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    padding: 0 1rem;
     background: white;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
   }
   section:nth-child(2) {
+    padding: 0 1.5rem;
     background: #f1f1f1;
     font-weight: bold;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  section:nth-child(3) {
+    padding: 1.5em;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
   div,
   span {
     padding: 1.5rem 1rem;
   }
   span {
+    padding: 1.5rem;
+    font-weight: bold;
     text-align: left;
   }
   footer {
     display: flex;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
     margin-top: 1rem;
+    gap: 1rem;
   }
   button {
+    width: 100%;
     padding: 1rem 2rem;
     background: #f1f1f1;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
+  }
+  .highlight {
+    background: #ddd;
+  }
+  .point {
+    font-weight: bold;
+  }
+  .bold {
+    font-weight: bold;
+  }
+  @media screen and (max-height: 400px) {
+    header {
+      display: none;
+    }
   }
 </style>
