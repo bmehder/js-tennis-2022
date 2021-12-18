@@ -6,13 +6,12 @@
   let match = new Match()
 
   let isMatchInProgress = true
-  // let tiebreakPoints = 0
   let isShowDetails = false
 
   $: currentSet = `set${match.currentSet}`
 
   // 	Predicates
-  const isDeuce = () =>
+  $: isDeuce = () =>
     match.score['p1'].game === '40' && match.score['p2'].game === '40'
 
   const isGameOver = winner => match.score[winner].game === '0'
