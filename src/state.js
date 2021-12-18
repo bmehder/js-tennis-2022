@@ -1,17 +1,18 @@
 export default function Match() {
   return {
     currentSet: 1,
+    playerToServe: 'p1',
     score: {
-      player1: {
-        set1: 0,
+      p1: {
+        set1: 5,
         set2: 0,
         set3: 0,
         game: '0',
         setsWon: 0,
         tiebreak: 0,
       },
-      player2: {
-        set1: 0,
+      p2: {
+        set1: 5,
         set2: 0,
         set3: 0,
         game: '0',
@@ -32,7 +33,7 @@ export default function Match() {
 //     return {
 //       currentSet: 1,
 //       score: {
-//         player1: {
+//         p1: {
 //           set1: 4,
 //           set2: 0,
 //           set3: 0,
@@ -40,7 +41,7 @@ export default function Match() {
 //           setsWon: 0,
 //           tiebreak: 0,
 //         },
-//         player2: {
+//         p2: {
 //           set1: 0,
 //           set2: 0,
 //           set3: 0,

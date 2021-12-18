@@ -1,52 +1,57 @@
 <script>
   import { scale } from 'svelte/transition'
-  import Match from './state'
   import { gamePointEnum } from './utils'
 
-  const match = new Match()
+  import Match from './state'
+  let match = new Match()
 
-  let isInProgress = true
-  let playerToServe = 'player1'
+  let isMatchInProgress = true
 
-  $: currentSet = 'set' + match.currentSet
+  $: currentSet = `set${match.currentSet}`
 
   // 	Predicates
   const isDeuce = () =>
-    match.score['player1'].game === '40' && match.score['player2'].game === '40'
+    match.score['p1'].game === '40' && match.score['p2'].game === '40'
 
   const isGameOver = winner => match.score[winner].game === '0'
 
   const isSetOver = () => {
     return (
-      (match.score['player1'][currentSet] >= 6 &&
-        match.score['player1'][currentSet] -
-          match.score['player2'][currentSet] >=
-          2) ||
-      (match.score['player2'][currentSet] >= 6 &&
-        match.score['player2'][currentSet] -
-          match.score['player1'][currentSet] >=
-          2)
+      (match.score['p1'][currentSet] >= 6 &&
+        match.score['p1'][currentSet] - match.score['p2'][currentSet] >= 2) ||
+      (match.score['p2'][currentSet] >= 6 &&
+        match.score['p2'][currentSet] - match.score['p1'][currentSet] >= 2)
     )
   }
+
+  const isTiebreakOver = () => {
+    return (
+      (match.score.p1.tiebreak >= 7 &&
+        match.score.p1.tiebreak - match.score.p2.tiebreak >= 2) ||
+      (match.score.p2.tiebreak >= 7 &&
+        match.score.p2.tiebreak - match.score.p1.tiebreak >= 2)
+    )
+  }
+
   const isMatchOver = winner => match.score[winner].setsWon === 2
 
   $: isTiebreak = () =>
-    match.score['player1'][currentSet] === 6 &&
-    match.score['player2'][currentSet] === 6
+    match.score['p1'][currentSet] === 6 && match.score['p2'][currentSet] === 6
 
   // State Mutation Functions
   const resetGameScore = () => {
-    match.score['player1'].game = '0'
-    match.score['player2'].game = '0'
-    match.score.player1.tiebreak = 0
-    match.score.player2.tiebreak = 0
+    match.score['p1'].game = 0
+    match.score['p2'].game = 0
+    match.score.p1.tiebreak = 0
+    match.score.p2.tiebreak = 0
+    match.playerToServe = match.playerToServe === 'p1' ? 'p2' : 'p1'
   }
 
-  const completeMatch = winner => {
+  const completeMatch = () => {
     const lastSet = match.currentSet - 1
     match.currentSet = lastSet
-    alert(`${winner} won the match!`)
-    isInProgress = false
+    isMatchInProgress = false
+    match.playerToServe = null
   }
 
   const updateSet = winner => {
@@ -54,76 +59,42 @@
 
     match.score[winner][currentSet]++
 
-    playerToServe = playerToServe === 'player1' ? 'player2' : 'player1'
-
     if (isSetOver()) {
       match.currentSet++
       match.score[winner].setsWon++
       match.score.setWinner[currentSet] = winner
     }
 
-    if (isMatchOver(winner)) {
-      completeMatch(winner)
-    }
+    isMatchOver(winner) && completeMatch(winner)
   }
 
   const scoreTiebreak = winner => {
-    playerToServe = null
-    winner === 'player1'
-      ? match.score.player1.tiebreak++
-      : [match.score.player2.tiebreak++]
+    match.playerToServe = null
 
-    if (
-      (match.score.player1.tiebreak >= 7 &&
-        match.score.player1.tiebreak - match.score.player2.tiebreak >= 2) ||
-      (match.score.player2.tiebreak >= 7 &&
-        match.score.player2.tiebreak - match.score.player1.tiebreak >= 2)
-    ) {
+    winner === 'p1' ? match.score.p1.tiebreak++ : match.score.p2.tiebreak++
+
+    if (isTiebreakOver()) {
       match.score[winner][currentSet]++
       match.currentSet++
       match.score[winner].setsWon++
       match.score.setWinner[currentSet] = winner
-      playerToServe = winner === 'player1' ? 'player2' : 'player1'
+      match.playerToServe = winner === 'p1' ? 'p2' : 'p1'
       resetGameScore()
     }
 
-    if (isMatchOver(winner)) {
-      completeMatch(winner)
-    }
+    isMatchOver(winner) && completeMatch(winner)
   }
 
   // 	Event handlers
   const handleReset = () => {
-    match.currentSet = 1
-    match.score = {
-      player1: {
-        set1: 0,
-        set2: 0,
-        set3: 0,
-        game: '0',
-        setsWon: 0,
-        tiebreak: 0,
-      },
-      player2: {
-        set1: 0,
-        set2: 0,
-        set3: 0,
-        game: '0',
-        setsWon: 0,
-        tiebreak: 0,
-      },
-      setWinner: {
-        set1: null,
-        set2: null,
-        set3: null,
-      },
-    }
-    return true
+    match = new Match()
+    isMatchInProgress = true
+    match.playerToServe = 'p1'
   }
 
   const handlePoint = theWinner => {
     const winner = theWinner
-    const loser = winner === 'player1' ? 'player2' : 'player1'
+    const loser = winner === 'p1' ? 'p2' : 'p1'
     const winnerScore = match.score[winner].game
     const loserScore = match.score[loser].game
 
@@ -149,7 +120,7 @@
 
     match.score[winner].game = gamePointEnum[winnerScore]
 
-    if (isGameOver(winner)) updateSet(winner)
+    isGameOver(winner) && updateSet(winner)
   }
 
   // 	Console Logging
@@ -177,75 +148,73 @@
 
   <section>
     <span
-      >Player 1{#if playerToServe === 'player1'}
+      >Player 1{#if match.playerToServe === 'p1'}
         &nbsp; &bull;{/if}</span
     >
-    {#key match.score['player1'].set1}
-      <div class:bold={match.score.setWinner.set1 === 'player1'} in:scale>
-        {match.score['player1'].set1}
+    {#key match.score['p1'].set1}
+      <div class:bold={match.score.setWinner.set1 === 'p1'} in:scale>
+        {match.score['p1'].set1}
       </div>
     {/key}
-    {#key match.score['player1'].set2}
-      <div class:bold={match.score.setWinner.set2 === 'player1'} in:scale>
-        {match.score['player1'].set2}
+    {#key match.score['p1'].set2}
+      <div class:bold={match.score.setWinner.set2 === 'p1'} in:scale>
+        {match.score['p1'].set2}
       </div>
     {/key}
-    {#key match.score['player1'].set3}
-      <div class:bold={match.score.setWinner.set3 === 'player1'} in:scale>
-        {match.score['player1'].set3}
+    {#key match.score['p1'].set3}
+      <div class:bold={match.score.setWinner.set3 === 'p1'} in:scale>
+        {match.score['p1'].set3}
       </div>
     {/key}
-    {#key match.score.player1.game}
+    {#key match.score.p1.game}
       {#if isTiebreak()}
         <div class="point" in:scale>
-          {match.score['player1'].tiebreak}
+          {match.score['p1'].tiebreak}
         </div>
       {:else}
-        <div class="point" class:gray={!isInProgress} in:scale>
-          {match.score['player1'].game}
+        <div class="point" class:gray={!isMatchInProgress} in:scale>
+          {match.score['p1'].game}
         </div>
       {/if}
     {/key}
     <span
-      >Player 2 {#if playerToServe === 'player2'}
+      >Player 2 {#if match.playerToServe === 'p2'}
         &nbsp; &bull;{/if}</span
     >
-    {#key match.score['player2'].set1}
-      <div class:bold={match.score.setWinner.set1 === 'player2'} in:scale>
-        {match.score['player2'].set1}
+    {#key match.score['p2'].set1}
+      <div class:bold={match.score.setWinner.set1 === 'p2'} in:scale>
+        {match.score['p2'].set1}
       </div>
     {/key}
-    {#key match.score['player2'].set2}
-      <div class:bold={match.score.setWinner.set2 === 'player2'} in:scale>
-        {match.score['player2'].set2}
+    {#key match.score['p2'].set2}
+      <div class:bold={match.score.setWinner.set2 === 'p2'} in:scale>
+        {match.score['p2'].set2}
       </div>
     {/key}
-    {#key match.score['player2'].set3}
-      <div class:bold={match.score.setWinner.set3 === 'player2'} in:scale>
-        {match.score['player2'].set3}
+    {#key match.score['p2'].set3}
+      <div class:bold={match.score.setWinner.set3 === 'p2'} in:scale>
+        {match.score['p2'].set3}
       </div>
     {/key}
-    {#key match.score.player2.game}
+    {#key match.score.p2.game}
       {#if isTiebreak()}
         <div class="point" in:scale>
-          {match.score['player2'].tiebreak}
+          {match.score['p2'].tiebreak}
         </div>
       {:else}
-        <div class="point" class:gray={!isInProgress} in:scale>
-          {match.score['player2'].game}
+        <div class="point" class:gray={!isMatchInProgress} in:scale>
+          {match.score['p2'].game}
         </div>
       {/if}
     {/key}
   </section>
 
   <footer>
-    {#if isInProgress}
-      <button on:click={() => handlePoint('player1')}>Player 1</button>
-      <button on:click={() => handlePoint('player2')}>Player 2</button>
+    {#if isMatchInProgress}
+      <button on:click={() => handlePoint('p1')}>Player 1</button>
+      <button on:click={() => handlePoint('p2')}>Player 2</button>
     {:else}
-      <button on:click={() => handleReset() && (isInProgress = true)}
-        >Reset</button
-      >
+      <button on:click={() => handleReset()}>Reset</button>
     {/if}
   </footer>
 </aside>
