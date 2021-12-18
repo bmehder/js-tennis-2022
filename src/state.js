@@ -24,6 +24,7 @@ export default function Match() {
         set2: null,
         set3: null,
       },
+      tiebreakPoints: 0,
     },
   }
 }

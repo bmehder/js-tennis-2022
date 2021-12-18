@@ -2,12 +2,12 @@
   import { scale } from 'svelte/transition'
   import { gamePointEnum } from './utils'
 
-  import Console from './Console.svelte'
   import Match from './state'
   let match = new Match()
 
   let isMatchInProgress = true
-  let tiebreakPoints = 0
+  // let tiebreakPoints = 0
+  let isShowDetails = false
 
   $: currentSet = `set${match.currentSet}`
 
@@ -71,7 +71,7 @@
   }
 
   const scoreTiebreak = winner => {
-    tiebreakPoints++
+    match.score.tiebreakPoints++
 
     winner === 'p1' ? match.score.p1.tiebreak++ : match.score.p2.tiebreak++
 
@@ -81,13 +81,13 @@
       match.score[winner].setsWon++
       match.score.setWinner[currentSet] = winner
       match.playerToServe = match.playerToServe === 'p1' ? 'p1' : 'p2'
-      tiebreakPoints = 0
+      match.score.tiebreakPoints = 0
       resetGameScore()
     }
 
     isMatchOver(winner) && completeMatch(winner)
 
-    if (tiebreakPoints === 1) {
+    if (match.score.tiebreakPoints === 1) {
       match.playerToServe === 'p1'
         ? (match.playerToServe = 'p2')
         : (match.playerToServe = 'p1')
@@ -95,7 +95,7 @@
       return
     }
 
-    if (tiebreakPoints % 2 !== 0) {
+    if (match.score.tiebreakPoints % 2 !== 0) {
       match.playerToServe === 'p1'
         ? (match.playerToServe = 'p2')
         : (match.playerToServe = 'p1')
@@ -141,6 +141,7 @@
   }
 </script>
 
+<span><input type="checkbox" bind:checked={isShowDetails} /></span>
 <aside>
   <section>
     <div />
@@ -227,9 +228,26 @@
   </footer>
 </aside>
 
-<Console {match} {isDeuce} {isTiebreak} />
+{#if isShowDetails}
+  <details open transition:scale>
+    <summary>Log info</summary>
+    <p>Current set: {match.currentSet}</p>
+    <p>Is Deuce: {isDeuce()}</p>
+    <p>Is Tiebreak: {isTiebreak()}</p>
+    <pre>{JSON.stringify(match.score, null, 2)}</pre>
+  </details>
+{/if}
 
 <style>
+  span input {
+    opacity: 0;
+    position: absolute;
+    top: 1em;
+    left: 1em;
+  }
+  span:hover input {
+    opacity: 1;
+  }
   aside {
     width: 700px;
     margin: auto;
@@ -289,6 +307,16 @@
   button:hover {
     transform: scale(0.99);
     transition: all 100ms ease-in-out;
+  }
+  details {
+    width: 700px;
+    margin: auto;
+    padding: 2em;
+    background: white;
+  }
+  details p,
+  details pre {
+    margin-left: 2rem;
   }
   .highlight {
     background: #ccc;
