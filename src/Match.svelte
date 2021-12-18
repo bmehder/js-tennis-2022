@@ -79,7 +79,7 @@
       match.currentSet++
       match.score[winner].setsWon++
       match.score.setWinner[currentSet] = winner
-      match.playerToServe = winner === 'p1' ? 'p1' : 'p2'
+      match.playerToServe = match.playerToServe === 'p1' ? 'p1' : 'p2'
       tiebreakPoints = 0
       resetGameScore()
     }
