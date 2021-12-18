@@ -2,6 +2,7 @@
   import { scale } from 'svelte/transition'
   import { gamePointEnum } from './utils'
 
+  import Console from './Console.svelte'
   import Match from './state'
   let match = new Match()
 
@@ -138,15 +139,6 @@
 
     isGameOver(winner) && updateSet(winner)
   }
-
-  // 	Console Logging
-  // $: {
-  //   console.clear()
-  //   console.log('Current set:', match.currentSet)
-  //   console.log('isDeuce:', isDeuce())
-  //   console.log('isTiebreak:', isTiebreak())
-  //   console.table(match.score)
-  // }
 </script>
 
 <aside>
@@ -234,6 +226,8 @@
     {/if}
   </footer>
 </aside>
+
+<Console {match} {isDeuce} {isTiebreak} />
 
 <style>
   aside {
