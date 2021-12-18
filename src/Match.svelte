@@ -6,6 +6,7 @@
   let match = new Match()
 
   let isMatchInProgress = true
+  let tiebreakPoints = 0
 
   $: currentSet = `set${match.currentSet}`
 
@@ -69,7 +70,7 @@
   }
 
   const scoreTiebreak = winner => {
-    match.playerToServe = null
+    tiebreakPoints++
 
     winner === 'p1' ? match.score.p1.tiebreak++ : match.score.p2.tiebreak++
 
@@ -78,11 +79,26 @@
       match.currentSet++
       match.score[winner].setsWon++
       match.score.setWinner[currentSet] = winner
-      match.playerToServe = winner === 'p1' ? 'p2' : 'p1'
+      match.playerToServe = winner === 'p1' ? 'p1' : 'p2'
+      tiebreakPoints = 0
       resetGameScore()
     }
 
     isMatchOver(winner) && completeMatch(winner)
+
+    if (tiebreakPoints === 1) {
+      match.playerToServe === 'p1'
+        ? (match.playerToServe = 'p2')
+        : (match.playerToServe = 'p1')
+
+      return
+    }
+
+    if (tiebreakPoints % 2 !== 0) {
+      match.playerToServe === 'p1'
+        ? (match.playerToServe = 'p2')
+        : (match.playerToServe = 'p1')
+    }
   }
 
   // 	Event handlers
@@ -124,13 +140,13 @@
   }
 
   // 	Console Logging
-  $: {
-    console.clear()
-    console.log('Current set:', match.currentSet)
-    console.log('isDeuce:', isDeuce())
-    console.log('isTiebreak:', isTiebreak())
-    console.table(match.score)
-  }
+  // $: {
+  //   console.clear()
+  //   console.log('Current set:', match.currentSet)
+  //   console.log('isDeuce:', isDeuce())
+  //   console.log('isTiebreak:', isTiebreak())
+  //   console.table(match.score)
+  // }
 </script>
 
 <aside>
