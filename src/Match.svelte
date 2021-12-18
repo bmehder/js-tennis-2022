@@ -230,7 +230,7 @@
 {#if isShowDetails}
   <details open transition:scale>
     <summary>Log info</summary>
-    <p>Current set: {match.currentSet}</p>
+    <p>Current Set: {match.currentSet}</p>
     <p>Is Deuce: {isDeuce()}</p>
     <p>Is Tiebreak: {isTiebreak()}</p>
     <pre>{JSON.stringify(match.score, null, 2)}</pre>
