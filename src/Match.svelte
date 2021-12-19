@@ -9,7 +9,20 @@
   let isMatchInProgress = true
   let isShowDetails = false
 
+  // Ailias variables
   $: currentSet = `set${match.currentSet}`
+
+  $: set1P1Score = match.score['p1'].set1
+  $: set2P1Score = match.score['p1'].set2
+  $: set3P1Score = match.score['p1'].set3
+  $: gameP1Score = match.score.p1.game
+  $: tiebreakP1Score = match.score['p1'].tiebreak
+
+  $: set1P2Score = match.score['p2'].set1
+  $: set2P2Score = match.score['p2'].set2
+  $: set3P2Score = match.score['p2'].set3
+  $: gameP2Score = match.score.p2.game
+  $: tiebreakP2Score = match.score['p2'].tiebreak
 
   const createNewMatch = () => {
     match = new Match()
@@ -53,6 +66,14 @@
 
   const isMatchOver = winner => match.score[winner].setsWon === 2
 
+  const isP1Set1Winner = () => match.score.setWinner.set1 === 'p1'
+  const isP1Set2Winner = () => match.score.setWinner.set2 === 'p1'
+  const isP1Set3Winner = () => match.score.setWinner.set3 === 'p1'
+
+  const isP2Set1Winner = () => match.score.setWinner.set1 === 'p2'
+  const isP2Set2Winner = () => match.score.setWinner.set2 === 'p2'
+  const isP2Set3Winner = () => match.score.setWinner.set3 === 'p2'
+
   $: isTiebreak = () =>
     match.score['p1'][currentSet] === 6 && match.score['p2'][currentSet] === 6
 
@@ -95,6 +116,15 @@
 
   const setWinnerPointToAd = winner => (match.score[winner].game = 'Ad')
 
+  // Resetter Functions
+  const resetTiebreakPoints = () => (match.score.tiebreakPoints = 0)
+
+  const resetGameScore = () => {
+    setGamePointsToZero()
+    setTiebreakPointsToZero()
+    setPlayerToServe()
+  }
+
   // Incrementer Functions
   const incrementSetScoreForWinner = winner => match.score[winner][currentSet]++
 
@@ -106,15 +136,6 @@
     winner === 'p1' ? match.score.p1.tiebreak++ : match.score.p2.tiebreak++
 
   const incrementNumberOfTiebreakPoints = () => match.score.tiebreakPoints++
-
-  // Resetter Functions
-  const resetTiebreakPoints = () => (match.score.tiebreakPoints = 0)
-
-  const resetGameScore = () => {
-    setGamePointsToZero()
-    setTiebreakPointsToZero()
-    setPlayerToServe()
-  }
 
   // Completer Functions
   const completeSet = winner => {
@@ -217,29 +238,29 @@
       >Player 1{#if match.playerToServe === 'p1'}
         &nbsp; &bull;{/if}</span
     >
-    {#key match.score['p1'].set1}
-      <div class:bold={match.score.setWinner.set1 === 'p1'} in:scale>
-        {match.score['p1'].set1}
+    {#key set1P1Score}
+      <div class:bold={isP1Set1Winner()} in:scale>
+        {set1P1Score}
       </div>
     {/key}
-    {#key match.score['p1'].set2}
-      <div class:bold={match.score.setWinner.set2 === 'p1'} in:scale>
-        {match.score['p1'].set2}
+    {#key set2P1Score}
+      <div class:bold={isP1Set2Winner()} in:scale>
+        {set2P1Score}
       </div>
     {/key}
-    {#key match.score['p1'].set3}
-      <div class:bold={match.score.setWinner.set3 === 'p1'} in:scale>
-        {match.score['p1'].set3}
+    {#key set3P1Score}
+      <div class:bold={isP1Set3Winner()} in:scale>
+        {set3P1Score}
       </div>
     {/key}
-    {#key match.score.p1.game}
+    {#key gameP1Score}
       {#if isTiebreak()}
         <div class="point" in:scale>
-          {match.score['p1'].tiebreak}
+          {tiebreakP1Score}
         </div>
       {:else}
         <div class="point" class:gray={!isMatchInProgress} in:scale>
-          {match.score['p1'].game}
+          {gameP1Score}
         </div>
       {/if}
     {/key}
@@ -247,29 +268,29 @@
       >Player 2 {#if match.playerToServe === 'p2'}
         &nbsp; &bull;{/if}</span
     >
-    {#key match.score['p2'].set1}
-      <div class:bold={match.score.setWinner.set1 === 'p2'} in:scale>
-        {match.score['p2'].set1}
+    {#key set1P2Score}
+      <div class:bold={isP2Set1Winner()} in:scale>
+        {set1P2Score}
       </div>
     {/key}
-    {#key match.score['p2'].set2}
-      <div class:bold={match.score.setWinner.set2 === 'p2'} in:scale>
-        {match.score['p2'].set2}
+    {#key set2P2Score}
+      <div class:bold={isP2Set2Winner()} in:scale>
+        {set2P2Score}
       </div>
     {/key}
-    {#key match.score['p2'].set3}
-      <div class:bold={match.score.setWinner.set3 === 'p2'} in:scale>
-        {match.score['p2'].set3}
+    {#key set3P2Score}
+      <div class:bold={isP2Set3Winner()} in:scale>
+        {set3P2Score}
       </div>
     {/key}
-    {#key match.score.p2.game}
+    {#key gameP2Score}
       {#if isTiebreak()}
         <div class="point" in:scale>
-          {match.score['p2'].tiebreak}
+          {tiebreakP2Score}
         </div>
       {:else}
         <div class="point" class:gray={!isMatchInProgress} in:scale>
-          {match.score['p2'].game}
+          {gameP2Score}
         </div>
       {/if}
     {/key}
