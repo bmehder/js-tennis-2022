@@ -17,12 +17,6 @@
   }
   createNewMatch()
 
-  const getPointLoser = winner => (winner === 'p1' ? 'p2' : 'p1')
-
-  const getWinnerScore = winner => match.score[winner].game
-
-  const getLoserScore = winner => match.score[winner].game
-
   // 	Predicates
   $: isDeuce = () =>
     match.score['p1'].game === '40' && match.score['p2'].game === '40'
@@ -61,7 +55,16 @@
   $: isTiebreak = () =>
     match.score['p1'][currentSet] === 6 && match.score['p2'][currentSet] === 6
 
-  // State Mutation Functions
+  // Getter Functions
+  const getPointLoser = winner => (winner === 'p1' ? 'p2' : 'p1')
+
+  const getWinnerScore = winner => match.score[winner].game
+
+  const getLoserScore = winner => match.score[winner].game
+
+  const getLastSet = () => match.currentSet - 1
+
+  // Setter Functions
   const setNormalGamePoint = (winner, winnerScore) =>
     (match.score[winner].game = gamePointEnum[winnerScore])
 
@@ -71,18 +74,8 @@
   const setPlayerToServeAfterTiebreak = () =>
     (match.playerToServe = match.playerToServe === 'p1' ? 'p1' : 'p2')
 
-  const resetTiebreakPoints = () => (match.score.tiebreakPoints = 0)
-
-  const getLastSet = () => match.currentSet - 1
-
-  const increaseSetScoreForWinner = winner => match.score[winner][currentSet]++
-
   const setWinnerForCurrentSet = winner =>
     (match.score.setWinner[currentSet] = winner)
-
-  const incrementSetsWonForPlayer = winner => match.score[winner].setsWon++
-
-  const incrementCurrentSet = () => match.currentSet++
 
   const setGamePointsToZero = () => {
     match.score['p1'].game = 0
@@ -101,11 +94,28 @@
 
   const setWinnerPointToAd = winner => (match.score[winner].game = 'Ad')
 
+  // Incrementer Functions
+  const incrementSetScoreForWinner = winner => match.score[winner][currentSet]++
+
+  const incrementSetsWonForPlayer = winner => match.score[winner].setsWon++
+
+  const incrementCurrentSet = () => match.currentSet++
+
   const incrementTiebreakScoreForWinner = winner =>
     winner === 'p1' ? match.score.p1.tiebreak++ : match.score.p2.tiebreak++
 
   const incrementNumberOfTiebreakPoints = () => match.score.tiebreakPoints++
 
+  // Resetter Functions
+  const resetTiebreakPoints = () => (match.score.tiebreakPoints = 0)
+
+  const resetGameScore = () => {
+    setGamePointsToZero()
+    setTiebreakPointsToZero()
+    setPlayerToServe()
+  }
+
+  // Completer Functions
   const completeSet = winner => {
     incrementCurrentSet()
     incrementSetsWonForPlayer(winner)
@@ -114,7 +124,7 @@
 
   const completeTiebreak = winner => {
     incrementCurrentSet()
-    increaseSetScoreForWinner(winner)
+    incrementSetScoreForWinner(winner)
     incrementSetsWonForPlayer(winner)
     setWinnerForCurrentSet(winner)
     setPlayerToServeAfterTiebreak()
@@ -129,23 +139,18 @@
     return
   }
 
-  const resetGameScore = () => {
-    setGamePointsToZero()
-    setTiebreakPointsToZero()
-    setPlayerToServe()
-  }
-
+  // Update Functions
   const updateSet = winner => {
     resetGameScore()
 
-    increaseSetScoreForWinner(winner)
+    incrementSetScoreForWinner(winner)
 
     isSetOver() && completeSet(winner)
 
     isMatchOver(winner) && completeMatch(winner)
   }
 
-  const scoreTiebreak = winner => {
+  const updateTiebreak = winner => {
     incrementNumberOfTiebreakPoints()
 
     incrementTiebreakScoreForWinner(winner)
@@ -170,7 +175,7 @@
     const loserScore = getLoserScore(getPointLoser(winner))
 
     if (isTiebreak()) {
-      return scoreTiebreak(winner)
+      return updateTiebreak(winner)
     }
 
     if (isDeuce()) {
