@@ -4,6 +4,7 @@
 
   import Match from './state'
 
+  // Component State
   let match
   let isMatchInProgress = true
   let isShowDetails = false
