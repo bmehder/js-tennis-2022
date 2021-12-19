@@ -9,7 +9,7 @@
   let isMatchInProgress = true
   let isShowDetails = false
 
-  // Ailias variables
+  // Alias variables
   $: currentSet = `set${match.currentSet}`
 
   $: set1P1Score = match.score['p1'].set1
@@ -24,6 +24,7 @@
   $: gameP2Score = match.score.p2.game
   $: tiebreakP2Score = match.score['p2'].tiebreak
 
+  // Instantiate Match class
   const createNewMatch = () => {
     match = new Match()
     isMatchInProgress = true
@@ -35,9 +36,9 @@
   $: isDeuce = () =>
     match.score['p1'].game === '40' && match.score['p2'].game === '40'
 
-  const isLosersLastScoreAd = loserScore => loserScore === 'Ad'
+  const isLosersLastScoreIsAd = loserScore => loserScore === 'Ad'
 
-  const isWinnersLastScoreAd = winnerScore => winnerScore === 'Ad'
+  const isWinnersLastScoreIsAd = winnerScore => winnerScore === 'Ad'
 
   const isGameOver = winner => match.score[winner].game === '0'
 
@@ -50,6 +51,10 @@
     )
   }
 
+  const isTiebreakFirstPoint = () => match.score.tiebreakPoints === 1
+
+  const isOtherPlayerToServe = () => match.score.tiebreakPoints % 2 !== 0
+
   const isTiebreakOver = () => {
     return (
       (match.score.p1.tiebreak >= 7 &&
@@ -58,11 +63,6 @@
         match.score.p2.tiebreak - match.score.p1.tiebreak >= 2)
     )
   }
-
-  const isTiebreakFinishedFirstPoint = () => match.score.tiebreakPoints === 1
-
-  const isReadyForOtherPlayerToServer = () =>
-    match.score.tiebreakPoints % 2 !== 0
 
   const isMatchOver = winner => match.score[winner].setsWon === 2
 
@@ -74,6 +74,13 @@
   const isP2Set2Winner = () => match.score.setWinner.set2 === 'p2'
   const isP2Set3Winner = () => match.score.setWinner.set3 === 'p2'
 
+  $: isPlayer1ToServe = () => match.playerToServe === 'p1'
+  $: isPlayer2ToServe = () => match.playerToServe === 'p2'
+
+  $: isSet1 = () => match.currentSet === 1
+  $: isSet2 = () => match.currentSet === 2
+  $: isSet3 = () => match.currentSet === 3
+
   $: isTiebreak = () =>
     match.score['p1'][currentSet] === 6 && match.score['p2'][currentSet] === 6
 
@@ -82,9 +89,9 @@
 
   const getWinnerScore = winner => match.score[winner].game
 
-  const getLoserScore = winner => match.score[winner].game
+  const getLoserScore = loser => match.score[loser].game
 
-  const getLastSet = () => match.currentSet - 1
+  const getPreviousSet = () => match.currentSet - 1
 
   // Setter Functions
   const setNormalGamePoint = (winner, winnerScore) =>
@@ -155,7 +162,7 @@
   }
 
   const completeMatch = () => {
-    match.currentSet = getLastSet()
+    match.currentSet = getPreviousSet()
     isMatchInProgress = false
     match.playerToServe = null
     return
@@ -181,12 +188,12 @@
 
     isMatchOver(winner) && completeMatch(winner)
 
-    if (isTiebreakFinishedFirstPoint()) {
+    if (isTiebreakFirstPoint()) {
       setPlayerToServe()
       return
     }
 
-    isReadyForOtherPlayerToServer() && setPlayerToServe()
+    isOtherPlayerToServe() && setPlayerToServe()
   }
 
   // 	Event handlers
@@ -204,11 +211,11 @@
       return setWinnerPointToAd(winner)
     }
 
-    if (isLosersLastScoreAd(loserScore)) {
+    if (isLosersLastScoreIsAd(loserScore)) {
       return setGameScoreToDeuce()
     }
 
-    if (isWinnersLastScoreAd(winnerScore)) {
+    if (isWinnersLastScoreIsAd(winnerScore)) {
       return updateSet(winner)
     }
 
@@ -223,9 +230,9 @@
 <aside>
   <section>
     <div />
-    <div class:highlight={match.currentSet === 1}>Set 1</div>
-    <div class:highlight={match.currentSet === 2}>Set 2</div>
-    <div class:highlight={match.currentSet === 3}>Set 3</div>
+    <div class:highlight={isSet1()}>Set 1</div>
+    <div class:highlight={isSet2()}>Set 2</div>
+    <div class:highlight={isSet3()}>Set 3</div>
     {#if isTiebreak()}
       <div>TB</div>
     {:else}
@@ -235,9 +242,11 @@
 
   <section>
     <span
-      >Player 1{#if match.playerToServe === 'p1'}
-        &nbsp; &bull;{/if}</span
-    >
+      >Player 1
+      {#if isPlayer1ToServe()}
+        &nbsp; &bull;
+      {/if}
+    </span>
     {#key set1P1Score}
       <div class:bold={isP1Set1Winner()} in:scale>
         {set1P1Score}
@@ -265,9 +274,11 @@
       {/if}
     {/key}
     <span
-      >Player 2 {#if match.playerToServe === 'p2'}
-        &nbsp; &bull;{/if}</span
-    >
+      >Player 2
+      {#if isPlayer2ToServe()}
+        &nbsp; &bull;
+      {/if}
+    </span>
     {#key set1P2Score}
       <div class:bold={isP2Set1Winner()} in:scale>
         {set1P2Score}
