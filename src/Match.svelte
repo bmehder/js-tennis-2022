@@ -3,16 +3,33 @@
   import { gamePointEnum } from './utils'
 
   import Match from './state'
-  let match = new Match()
 
+  let match
   let isMatchInProgress = true
   let isShowDetails = false
 
   $: currentSet = `set${match.currentSet}`
 
+  const createNewMatch = () => {
+    match = new Match()
+    isMatchInProgress = true
+    match.playerToServe = 'p1'
+  }
+  createNewMatch()
+
+  const getPointLoser = winner => (winner === 'p1' ? 'p2' : 'p1')
+
+  const getWinnerScore = winner => match.score[winner].game
+
+  const getLoserScore = winner => match.score[winner].game
+
   // 	Predicates
   $: isDeuce = () =>
     match.score['p1'].game === '40' && match.score['p2'].game === '40'
+
+  const isLosersLastScoreAd = loserScore => loserScore === 'Ad'
+
+  const isWinnersLastScoreAd = winnerScore => winnerScore === 'Ad'
 
   const isGameOver = winner => match.score[winner].game === '0'
 
@@ -34,113 +51,148 @@
     )
   }
 
+  const isTiebreakFinishedFirstPoint = () => match.score.tiebreakPoints === 1
+
+  const isReadyForOtherPlayerToServer = () =>
+    match.score.tiebreakPoints % 2 !== 0
+
   const isMatchOver = winner => match.score[winner].setsWon === 2
 
   $: isTiebreak = () =>
     match.score['p1'][currentSet] === 6 && match.score['p2'][currentSet] === 6
 
   // State Mutation Functions
-  const resetGameScore = () => {
+  const setNormalGamePoint = (winner, winnerScore) =>
+    (match.score[winner].game = gamePointEnum[winnerScore])
+
+  const setPlayerToServe = () =>
+    (match.playerToServe = match.playerToServe === 'p1' ? 'p2' : 'p1')
+
+  const setPlayerToServeAfterTiebreak = () =>
+    (match.playerToServe = match.playerToServe === 'p1' ? 'p1' : 'p2')
+
+  const resetTiebreakPoints = () => (match.score.tiebreakPoints = 0)
+
+  const getLastSet = () => match.currentSet - 1
+
+  const increaseSetScoreForWinner = winner => match.score[winner][currentSet]++
+
+  const setWinnerForCurrentSet = winner =>
+    (match.score.setWinner[currentSet] = winner)
+
+  const incrementSetsWonForPlayer = winner => match.score[winner].setsWon++
+
+  const incrementCurrentSet = () => match.currentSet++
+
+  const setGamePointsToZero = () => {
     match.score['p1'].game = 0
     match.score['p2'].game = 0
+  }
+
+  const setTiebreakPointsToZero = () => {
     match.score.p1.tiebreak = 0
     match.score.p2.tiebreak = 0
-    match.playerToServe = match.playerToServe === 'p1' ? 'p2' : 'p1'
+  }
+
+  const setGameScoreToDeuce = () => {
+    match.score.p1.game = '40'
+    match.score.p2.game = '40'
+  }
+
+  const setWinnerPointToAd = winner => (match.score[winner].game = 'Ad')
+
+  const incrementTiebreakScoreForWinner = winner =>
+    winner === 'p1' ? match.score.p1.tiebreak++ : match.score.p2.tiebreak++
+
+  const incrementNumberOfTiebreakPoints = () => match.score.tiebreakPoints++
+
+  const completeSet = winner => {
+    incrementCurrentSet()
+    incrementSetsWonForPlayer(winner)
+    setWinnerForCurrentSet(winner)
+  }
+
+  const completeTiebreak = winner => {
+    incrementCurrentSet()
+    increaseSetScoreForWinner(winner)
+    incrementSetsWonForPlayer(winner)
+    setWinnerForCurrentSet(winner)
+    setPlayerToServeAfterTiebreak()
+    resetTiebreakPoints()
+    resetGameScore()
   }
 
   const completeMatch = () => {
-    const lastSet = match.currentSet - 1
-    match.currentSet = lastSet
+    match.currentSet = getLastSet()
     isMatchInProgress = false
     match.playerToServe = null
+    return
+  }
+
+  const resetGameScore = () => {
+    setGamePointsToZero()
+    setTiebreakPointsToZero()
+    setPlayerToServe()
   }
 
   const updateSet = winner => {
     resetGameScore()
 
-    match.score[winner][currentSet]++
+    increaseSetScoreForWinner(winner)
 
-    if (isSetOver()) {
-      match.currentSet++
-      match.score[winner].setsWon++
-      match.score.setWinner[currentSet] = winner
-    }
+    isSetOver() && completeSet(winner)
 
     isMatchOver(winner) && completeMatch(winner)
   }
 
   const scoreTiebreak = winner => {
-    match.score.tiebreakPoints++
+    incrementNumberOfTiebreakPoints()
 
-    winner === 'p1' ? match.score.p1.tiebreak++ : match.score.p2.tiebreak++
+    incrementTiebreakScoreForWinner(winner)
 
-    if (isTiebreakOver()) {
-      match.score[winner][currentSet]++
-      match.currentSet++
-      match.score[winner].setsWon++
-      match.score.setWinner[currentSet] = winner
-      match.playerToServe = match.playerToServe === 'p1' ? 'p1' : 'p2'
-      match.score.tiebreakPoints = 0
-      resetGameScore()
-    }
+    isTiebreakOver() && completeTiebreak(winner)
 
     isMatchOver(winner) && completeMatch(winner)
 
-    if (match.score.tiebreakPoints === 1) {
-      match.playerToServe === 'p1'
-        ? (match.playerToServe = 'p2')
-        : (match.playerToServe = 'p1')
-
+    if (isTiebreakFinishedFirstPoint()) {
+      setPlayerToServe()
       return
     }
 
-    if (match.score.tiebreakPoints % 2 !== 0) {
-      match.playerToServe === 'p1'
-        ? (match.playerToServe = 'p2')
-        : (match.playerToServe = 'p1')
-    }
+    isReadyForOtherPlayerToServer() && setPlayerToServe()
   }
 
   // 	Event handlers
-  const handleReset = () => {
-    match = new Match()
-    isMatchInProgress = true
-    match.playerToServe = 'p1'
-  }
+  const handleReset = () => createNewMatch()
 
-  const handlePoint = theWinner => {
-    const winner = theWinner
-    const loser = winner === 'p1' ? 'p2' : 'p1'
-    const winnerScore = match.score[winner].game
-    const loserScore = match.score[loser].game
+  const handlePoint = winner => {
+    const winnerScore = getWinnerScore(winner)
+    const loserScore = getLoserScore(getPointLoser(winner))
 
     if (isTiebreak()) {
-      scoreTiebreak(winner)
-      return
+      return scoreTiebreak(winner)
     }
 
     if (isDeuce()) {
-      match.score[winner].game = 'Ad'
-      return
+      return setWinnerPointToAd(winner)
     }
 
-    if (loserScore === 'Ad') {
-      match.score[winner].game = '40'
-      match.score[loser].game = '40'
-      return
+    if (isLosersLastScoreAd(loserScore)) {
+      return setGameScoreToDeuce()
     }
 
-    if (winnerScore === 'Ad') {
+    if (isWinnersLastScoreAd(winnerScore)) {
       return updateSet(winner)
     }
 
-    match.score[winner].game = gamePointEnum[winnerScore]
+    setNormalGamePoint(winner, winnerScore)
 
     isGameOver(winner) && updateSet(winner)
   }
 </script>
 
 <span><input type="checkbox" bind:checked={isShowDetails} /></span>
+
 <aside>
   <section>
     <div />
