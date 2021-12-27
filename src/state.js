@@ -4,7 +4,7 @@ export default function Match() {
     playerToServe: 'p1',
     score: {
       p1: {
-        set1: 4,
+        set1: 0,
         set1TiebreakLoserScore: 0,
         set2: 0,
         set2TiebreakLoserScore: 0,
@@ -15,7 +15,7 @@ export default function Match() {
         tiebreak: 0,
       },
       p2: {
-        set1: 4,
+        set1: 0,
         set1TiebreakLoserScore: 0,
         set2: 0,
         set2TiebreakLoserScore: 0,

@@ -2,7 +2,7 @@
   import { scale } from 'svelte/transition'
   import { gamePointEnum } from './utils'
 
-  import Match from './state'
+  import State from './state'
 
   // Component State
   let match
@@ -27,7 +27,7 @@
 
   // Instantiate Match class
   const createNewMatch = () => {
-    match = new Match()
+    match = new State()
     isMatchInProgress = true
     match.playerToServe = 'p1'
   }
