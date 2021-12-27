@@ -88,6 +88,8 @@
   // Getter Functions
   const getPointLoser = winner => (winner === 'p1' ? 'p2' : 'p1')
 
+  const getTiebreakLoser = winner => (winner === 'p1' ? 'p2' : 'p1')
+
   const getWinnerScore = winner => match.score[winner].game
 
   const getLoserScore = loser => match.score[loser].game
@@ -106,6 +108,13 @@
 
   const setWinnerForCurrentSet = winner =>
     (match.score.setWinner[currentSet] = winner)
+
+  const setLoserTiebreakScore = winner => {
+    const loser = getTiebreakLoser(winner)
+
+    match.score[loser][currentSet + 'TiebreakLoserScore'] =
+      match.score[loser].tiebreak
+  }
 
   const setGamePointsToZero = () => {
     match.score['p1'].game = 0
@@ -153,13 +162,7 @@
   }
 
   const completeTiebreak = winner => {
-    const loser = winner === 'p1' ? 'p2' : 'p1'
-
-    match.score[loser][currentSet + 'TiebreakLoserScore'] =
-      match.score[loser].tiebreak
-
-    console.log(match.score[loser].tiebreak)
-
+    setLoserTiebreakScore(winner)
     incrementCurrentSet()
     incrementSetScoreForWinner(winner)
     incrementSetsWonForPlayer(winner)
