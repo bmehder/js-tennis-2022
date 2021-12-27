@@ -11,6 +11,7 @@
 
   // Alias variables
   $: currentSet = `set${match.currentSet}`
+  $: currentTbSet = `currentSet`
 
   $: set1P1Score = match.score['p1'].set1
   $: set2P1Score = match.score['p1'].set2
@@ -152,6 +153,13 @@
   }
 
   const completeTiebreak = winner => {
+    const loser = winner === 'p1' ? 'p2' : 'p1'
+
+    match.score[loser][currentSet + 'TiebreakLoserScore'] =
+      match.score[loser].tiebreak
+
+    console.log(match.score[loser].tiebreak)
+
     incrementCurrentSet()
     incrementSetScoreForWinner(winner)
     incrementSetsWonForPlayer(winner)
@@ -250,16 +258,25 @@
     {#key set1P1Score}
       <div class:bold={isP1Set1Winner()} in:scale>
         {set1P1Score}
+        {#if match.score.p1.set1TiebreakLoserScore !== 0}
+          <sup>{match.score.p1.set1TiebreakLoserScore}</sup>
+        {/if}
       </div>
     {/key}
     {#key set2P1Score}
       <div class:bold={isP1Set2Winner()} in:scale>
         {set2P1Score}
+        {#if match.score.p1.set2TiebreakLoserScore !== 0}
+          <sup>{match.score.p1.set2TiebreakLoserScore}</sup>
+        {/if}
       </div>
     {/key}
     {#key set3P1Score}
       <div class:bold={isP1Set3Winner()} in:scale>
         {set3P1Score}
+        {#if match.score.p1.set3TiebreakLoserScore !== 0}
+          <sup>{match.score.p1.set3TiebreakLoserScore}</sup>
+        {/if}
       </div>
     {/key}
     {#key gameP1Score}
@@ -282,16 +299,25 @@
     {#key set1P2Score}
       <div class:bold={isP2Set1Winner()} in:scale>
         {set1P2Score}
+        {#if match.score.p2.set1TiebreakLoserScore !== 0}
+          <sup>{match.score.p2.set1TiebreakLoserScore}</sup>
+        {/if}
       </div>
     {/key}
     {#key set2P2Score}
       <div class:bold={isP2Set2Winner()} in:scale>
         {set2P2Score}
+        {#if match.score.p2.set2TiebreakLoserScore !== 0}
+          <sup>{match.score.p2.set2TiebreakLoserScore}</sup>
+        {/if}
       </div>
     {/key}
     {#key set3P2Score}
       <div class:bold={isP2Set3Winner()} in:scale>
         {set3P2Score}
+        {#if match.score.p2.set3TiebreakLoserScore !== 0}
+          <sup>{match.score.p2.set3TiebreakLoserScore}</sup>
+        {/if}
       </div>
     {/key}
     {#key gameP2Score}
